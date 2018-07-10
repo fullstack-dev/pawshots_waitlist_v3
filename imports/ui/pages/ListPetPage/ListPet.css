@@ -1,0 +1,35 @@
+.list-div {
+	padding: 10px 30px;
+	max-width: 900px;
+	position: relative;
+	transform: translateX(-50%);
+	left: 50%;
+}
+
+.react-tabs {
+	min-height: 100vh;
+}
+
+.react-tabs__tab-list {
+	border: none;
+	margin-top: 10px;
+}
+
+.react-tabs__tab {
+	width: 25%;
+	text-align: center;
+	color: #707070;
+	border: none;
+}
+
+.react-tabs__tab--selected {
+	color: black;
+	border: none;
+}
+
+.list-group-item {
+	border: 1px solid #C1C1C1;
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+}

@@ -1,0 +1,31 @@
+.navbar-collapse {
+	position: absolute;
+	width: 100%;
+	left: 0;
+	height: 50px;
+	padding-right: 30px;
+	border-top: 1px solid #707070;
+	background-color: white;
+}
+
+.navbar-nav > li > a {
+	color: #707070;
+	font-size: 1.8rem;
+}
+
+@media (max-width: 768px) {
+	.navbar-left {
+		float: left !important;
+	}
+	.navbar-nav {
+		float: left;
+		margin: 0;
+	}
+	.navbar-right {
+		float: right !important;
+	}
+
+	.navbar-nav > li {
+    	float: left;
+  	}
+}
