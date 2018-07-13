@@ -150,7 +150,7 @@ class AddPet extends Component {
         },
         scheduledTime: ''
       }, () => {  
-        this.props.onNotification(this.props.pets.length);
+        this.props.onNotification(this.props.inQueuePets.length);
       });
 
     });
@@ -211,7 +211,8 @@ class AddPet extends Component {
 
 const App = withTracker(() => {
   return {
-    pets: Pets.find({}).fetch()
+    pets: Pets.find({}).fetch(),
+    inQueuePets: Pets.find({ clientStatus: { inQueue: true, scheduled: false, completed: false, deleted: false } }).fetch()
   }
 })(AddPet);
 
