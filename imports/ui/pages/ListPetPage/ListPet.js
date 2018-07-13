@@ -11,76 +11,34 @@ import './ListPet.css';
 
 import DetailPet from "../DetailPetPage/DetailPet";
 
-import Moment from 'moment';
-
 class ListPet extends Component {
   constructor(props) {
     super(props);
-    this.enableMessage = this.enableMessage.bind(this);
     this.state = { 
-      tabIndex: 0,
-      displaySchedules : [false]
+      tabIndex: 0
     };
   }
 
-  componentDidUpdate(previousProps, previousState) {
-    console.log("&&&&&&: ",previousProps);
-    console.log("&&&&&&: ",this.props);
-    console.log("=>", this.props.scheduledPets);
-    let newDisplaySchedules = this.state.displaySchedules.slice() //copy the array
-    for(let i = 0; i < this.props.scheduledPets.length; i ++) {
-      console.log("-->", this.props.scheduledPets[i].scheduledTime);
-      console.log("--->", this.props.scheduledPets[i].scheduledTimeNew);
-      let x = this.props.scheduledPets[i].scheduledTimeNew;
-      // x = this.props.scheduledPets[i].scheduledTimeNew;
-      console.log(x.getTime());
-
-      var d = new Date();
-      
-      var year = d.getFullYear();
-
-      var month = d.getMonth();
-
-      var day = d.getDate();
-
-      var temp = new Date(year,month,day).getTime();
-
-      console.log(x.getTime() + temp);
-
-      // var a = Moment([2007, 0, 29]);
-      // console.log("->", a)
+  gettingDisplaySchedule(props) {
+    let displaySchedules = [false];
+    for(let i = 0; i < props.scheduledPets.length; i ++) {
+      let x = props.scheduledPets[i].scheduledTimeNew;
 
       var now = new Date();
-      
-      console.log("---->", now)
-
-      console.log("---->", now.getTime());
+      var year = now.getFullYear();
+      var month = now.getMonth();
+      var day = now.getDate();
+      var temp = new Date(year,month,day).getTime();
 
       var difference = now.getTime() - temp - x.getTime();
-
-      console.log("@@: ", difference);
-
       var minuteVal = difference / 60000;
-      
       minuteVal = Math.round(minuteVal);
 
-      console.log("minuteVal: ", minuteVal);
-
       if(minuteVal >= 10) {
-        newDisplaySchedules[i] = true //execute the manipulations
+        displaySchedules[i] = true //execute the manipulations
       }
-      // var elapsed = this.props.scheduledPets[i].scheduledTimeNew - now;
-      // console.log("difference: ", elapsed);
     }
-    // this.setState({displaySchedules: newDisplaySchedules}, ()=> {
-    //   console.log("==>", this.state)
-    // }) //set the new state
-    
-    console.log("====>", newDisplaySchedules)
-  }
-
-  enableMessage() {
-    this.setState({displayMessage: true});
+    return displaySchedules;
   }
 
   onClickHandler(pet) {
@@ -101,37 +59,43 @@ class ListPet extends Component {
   }
 
   render() {
-    const {displayMessage} = this.state;
+    let displaySchedules = [];
+    displaySchedules = this.gettingDisplaySchedule(this.props);
+    let condition = false;
+    for(let i = 0; i < displaySchedules.length; i ++) {
+      condition = condition || displaySchedules[i];
+    }
 
     return (
       <div>
         <Tabs selectedIndex={this.state.tabIndex} onSelect={tabIndex => this.setState({ tabIndex })}>
           <TabList>
-            <Tab >Current</Tab>
+            <Tab>Current</Tab>
             <Tab>Completed</Tab>
             <Tab>Scheduled</Tab>
             <Tab>Deleted</Tab>
           </TabList> 
           <TabPanel>
             <div className="list-div">
-              {this.props.scheduledPets.length && !displayMessage ? <p>Scheduled Queue: </p> : <div/>}
-              {this.props.scheduledPets.length && !displayMessage ? this.props.scheduledPets.map((pet, idx) => (
-                <div className="list-group" key={`dogs-${idx.toString()}`}>
-                  <div className="list-group-item list-group-item-action flex-column align-items-start" onClick={() => this.onClickHandler(pet)}>
-                    <div className="d-flex w-100 justify-content-between">
-                      <div layout="row" layout-align="space-between">
-                        <div layout="row">
-                          <h4 className="mb-1">{pet.owner.firstName} {pet.owner.lastName}</h4>
+              {this.props.scheduledPets.length && condition ? <p>Scheduled Queue: </p> : <div/>}
+              {this.props.scheduledPets.length ? this.props.scheduledPets.map((pet, idx) => {
+                return displaySchedules[idx] ? 
+                  <div className="list-group" key={`dogs-${idx.toString()}`}>
+                    <div className="list-group-item list-group-item-action flex-column align-items-start" onClick={() => this.onClickHandler(pet)}>
+                      <div className="d-flex w-100 justify-content-between">
+                        <div layout="row" layout-align="space-between">
+                          <div layout="row">
+                            <h4 className="mb-1">{pet.owner.firstName} {pet.owner.lastName}</h4>
+                          </div>
                         </div>
+                        <DogList pet={pet} />
                       </div>
-                      <DogList pet={pet} />
+                      <h4 className="mb-1">
+                        {pet.scheduledTime}
+                      </h4>
                     </div>
-                    <h4 className="mb-1">
-                      {pet.scheduledTime}
-                    </h4>
-                  </div>
-                </div>
-              )) : <div className="no-events"></div>}
+                  </div> : <div/> }) : <div className="no-events"></div>}
+
               {this.props.inQueuePets.length ? <p>Normal Queue: </p> : <div/>}
               {this.props.inQueuePets.length ? this.props.inQueuePets.map((pet, idx) => (
                 <div className="list-group" key={`dogs-${idx.toString()}`}>
