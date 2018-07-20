@@ -11,6 +11,10 @@ import './ListPet.css';
 
 import DetailPet from "../DetailPetPage/DetailPet";
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPaw  } from '@fortawesome/fontawesome-free-solid'
+import { faUser  } from '@fortawesome/fontawesome-free-solid'
+
 class ListPet extends Component {
   constructor(props) {
     super(props);
@@ -19,26 +23,64 @@ class ListPet extends Component {
     };
   }
 
+  gettingCountProperties(props) {
+    let totalInQueuePets = 0;
+    let totalSchedulePets = 0;
+    let totalCompletedPets = 0;
+    let totalDeletedPets = 0;
+    let totalUsers = 1;
+    console.log("=>", props);
+
+    if(props.inQueuePets.length) {
+      for (let i = 0; i < props.inQueuePets.length; i ++) {
+        totalInQueuePets += props.inQueuePets[i].dogs.length;
+      }
+    }
+
+    if(props.scheduledPets.length) {
+      for (let i = 0; i < props.scheduledPets.length; i ++) {
+        totalSchedulePets += props.scheduledPets[i].dogs.length;
+      }
+    }
+
+    if(props.completedPets.length) {
+      for (let i = 0; i < props.completedPets.length; i ++) {
+        totalCompletedPets += props.completedPets[i].dogs.length;
+      }
+    }
+
+    if(props.deletedPets.length) {
+      for (let i = 0; i < props.deletedPets.length; i ++) {
+        totalDeletedPets += props.deletedPets[i].dogs.length;
+      }
+    }
+    
+    return {totalInQueuePets: totalInQueuePets, totalSchedulePets: totalSchedulePets, totalCompletedPets: totalCompletedPets, totalDeletedPets: totalDeletedPets};
+  }
+
   gettingDisplaySchedule(props) {
     let displaySchedules = [false];
+    let overdue= [false];
     for(let i = 0; i < props.scheduledPets.length; i ++) {
       let x = props.scheduledPets[i].scheduledTimeNew;
 
       var now = new Date();
-      var year = now.getFullYear();
-      var month = now.getMonth();
-      var day = now.getDate();
-      var temp = new Date(year,month,day).getTime();
-
-      var difference = now.getTime() - temp - x.getTime();
+      var difference = x - now.getTime();
       var minuteVal = difference / 60000;
       minuteVal = Math.round(minuteVal);
 
-      if(minuteVal >= 10) {
-        displaySchedules[i] = true //execute the manipulations
+      if(minuteVal <= 10 && minuteVal >= 0) {
+        displaySchedules[i] = true; //execute the manipulations
+        overdue[i] = false;
+      } else if(minuteVal < 0) {
+        displaySchedules[i] = true;
+        overdue[i] = true;
+      } else {
+        displaySchedules[i] = false;
+        overdue[i] = false;
       }
     }
-    return displaySchedules;
+    return {displaySchedules: displaySchedules, overdue: overdue};
   }
 
   onClickHandler(pet) {
@@ -59,8 +101,21 @@ class ListPet extends Component {
   }
 
   render() {
+
+    let tempPets = this.gettingCountProperties(this.props);
+    let totalInQueuePets = tempPets.totalInQueuePets;
+    let totalSchedulePets = tempPets.totalSchedulePets;
+    let totalCompletedPets = tempPets.totalCompletedPets;
+    let totalDeletedPets = tempPets.totalDeletedPets;
+
+
     let displaySchedules = [];
-    displaySchedules = this.gettingDisplaySchedule(this.props);
+    let overdue = [];
+    let temp = this.gettingDisplaySchedule(this.props);
+    displaySchedules = temp.displaySchedules;
+    // displaySchedules = this.gettingDisplaySchedule(this.props);
+    overdue = temp.overdue;
+    
     let condition = false;
     for(let i = 0; i < displaySchedules.length; i ++) {
       condition = condition || displaySchedules[i];
@@ -77,6 +132,16 @@ class ListPet extends Component {
           </TabList> 
           <TabPanel>
             <div className="list-div">
+              <div className="status-div">
+                <div className="status-part-div">
+                  <FontAwesomeIcon icon={faUser}/>
+                  <p className="status-count">1</p>
+                </div>
+                <div className="status-part-div">
+                  <FontAwesomeIcon icon={faPaw}/>
+                  <p className="status-count">{totalInQueuePets}</p>
+                </div>
+              </div>
               {this.props.scheduledPets.length && condition ? <p>Scheduled Queue: </p> : <div/>}
               {this.props.scheduledPets.length ? this.props.scheduledPets.map((pet, idx) => {
                 return displaySchedules[idx] ? 
@@ -84,8 +149,11 @@ class ListPet extends Component {
                     <div className="list-group-item list-group-item-action flex-column align-items-start" onClick={() => this.onClickHandler(pet)}>
                       <div className="d-flex w-100 justify-content-between">
                         <div layout="row" layout-align="space-between">
-                          <div layout="row">
-                            <h4 className="mb-1">{pet.owner.firstName} {pet.owner.lastName}</h4>
+                          <div layout="row" className="overdue">
+                            <h4 className="mb-1">
+                              {pet.owner.firstName} {pet.owner.lastName}
+                            </h4>
+                            {overdue[idx] ? <div className="overdueTxt">(Overdue)</div> : <div/>}
                           </div>
                         </div>
                         <DogList pet={pet} />
@@ -115,6 +183,16 @@ class ListPet extends Component {
           </TabPanel>
           <TabPanel>
             <div className="list-div">
+              <div className="status-div">
+                <div className="status-part-div">
+                  <FontAwesomeIcon icon={faUser}/>
+                  <p className="status-count">1</p>
+                </div>
+                <div className="status-part-div">
+                  <FontAwesomeIcon icon={faPaw}/>
+                  <p className="status-count">{totalCompletedPets}</p>
+                </div>
+              </div>
               {this.props.completedPets.length ? this.props.completedPets.map((pet, idx) => (
                 <div className="list-group" key={`dogs-${idx.toString()}`}>
                   <div className="list-group-item list-group-item-action flex-column align-items-start" onClick={() => this.onClickHandler(pet)}>
@@ -133,6 +211,24 @@ class ListPet extends Component {
           </TabPanel>
           <TabPanel>
             <div className="list-div">
+              <div className="status-div">
+                <div className="status-part-div">
+                  <FontAwesomeIcon icon={faUser}/>
+                  <p className="status-count">1</p>
+                </div>
+                <div className="status-part-sch-div">
+                  <FontAwesomeIcon icon={faUser}/>
+                  <p className="status-count">1</p>
+                </div>
+                <div className="status-part-sch-div">
+                  <FontAwesomeIcon icon={faPaw}/>
+                  <p className="status-count">{totalSchedulePets}</p>
+                </div>
+                <div className="status-part-div">
+                  <FontAwesomeIcon icon={faPaw}/>
+                  <p className="status-count">{totalInQueuePets}</p>
+                </div>
+              </div>
               {this.props.scheduledPets.length ? this.props.scheduledPets.map((pet, idx) => (
                 <div className="list-group" key={`dogs-${idx.toString()}`}>
                   <div className="list-group-item list-group-item-action flex-column align-items-start" onClick={() => this.onClickHandler(pet)}>
@@ -144,6 +240,9 @@ class ListPet extends Component {
                       </div>
                       <DogList pet={pet} />
                     </div>
+                    <h4 className="mb-1">
+                      {pet.scheduledTime}
+                    </h4>
                   </div>
                 </div>
               )) : <div className="no-events"></div>}
@@ -151,6 +250,16 @@ class ListPet extends Component {
           </TabPanel>
           <TabPanel>
             <div className="list-div">
+              <div className="status-div">
+                <div className="status-part-div">
+                  <FontAwesomeIcon icon={faUser}/>
+                  <p className="status-count">1</p>
+                </div>
+                <div className="status-part-div">
+                  <FontAwesomeIcon icon={faPaw}/>
+                  <p className="status-count">{totalDeletedPets}</p>
+                </div>
+              </div>
               {this.props.deletedPets.length ? this.props.deletedPets.map((pet, idx) => (
                 <div className="list-group" key={`dogs-${idx.toString()}`}>
                   <div className="list-group-item list-group-item-action flex-column align-items-start" onClick={() => this.onClickHandler(pet)}>

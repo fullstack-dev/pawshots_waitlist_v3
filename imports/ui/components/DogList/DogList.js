@@ -10,7 +10,7 @@ export default class DogList extends Component {
     
     const listItems = pet.dogs.map((dog, idx) =>
       <li className="doglist-li" key={`dog-${idx.toString()}`}>
-        {dog.dogName}
+        {dog.dogName},
       </li>
     );
     return (

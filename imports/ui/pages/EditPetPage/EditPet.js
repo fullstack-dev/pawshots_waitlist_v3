@@ -136,10 +136,14 @@ class EditPet extends Component {
 
 	handleScheduledTimeChange = (event) => {
 		let scheduledTime = event.target.value;
-		console.log("scheduledTime=>", event.target);
+		var now = new Date();
+		var year = now.getFullYear();
+      	var month = now.getMonth();
+      	var day = now.getDate();
+      	var temp = new Date(year,month,day).getTime();
 	  	this.setState({
 	  		scheduledTime: scheduledTime,
-	  		scheduledTimeNew: event.target.valueAsDate
+	  		scheduledTimeNew: temp + event.target.valueAsDate.getTime()
 	  	});
 	}
 

@@ -33,3 +33,34 @@
 	justify-content: space-between;
 	align-items: baseline;
 }
+
+.overdue {
+	display: flex;
+	align-items: center;
+}
+
+.overdueTxt {
+	color: red;
+	margin-left: 10px;
+}
+
+.status-div {
+	display: flex;
+	justify-content: space-between;
+}
+
+.status-part-div {
+	display: flex;
+	align-items: baseline;
+}
+
+.status-part-sch-div {
+	display: flex;
+	align-items: baseline;
+	color: red;
+}
+
+.status-count {
+	font-size: 1.8rem;
+	margin-left: 5px;
+}
